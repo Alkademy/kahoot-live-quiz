@@ -32,7 +32,7 @@ export default function NavigationHeader({ rightContent, onHome }) {
             </div>
           ) : (
             <div className="auth-links">
-              <Link to="/login" className="button button-small">
+              <Link to="/login" className="button button-small button-ghost">
                 Log In
               </Link>
               <Link to="/signup" className="button button-small button-primary">
