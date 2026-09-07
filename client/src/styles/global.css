@@ -1,0 +1,458 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #f8f7f2;
+  background: #101317;
+  font-synthesis: none;
+  --ink: #f8f7f2;
+  --muted: #9ea4a2;
+  --lime: #c7f36b;
+  --coral: #ff725e;
+  --cyan: #64d4d0;
+  --line: #2d3337;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #101317;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+.page-shell,
+.game-shell,
+.player-shell {
+  min-height: 100vh;
+  padding: 32px clamp(22px, 5vw, 80px);
+  background:
+    radial-gradient(circle at 80% 0%, #26352d 0, transparent 36%), #101317;
+}
+.brand-lockup {
+  font: 700 14px "Space Grotesk";
+  letter-spacing: 0.13em;
+}
+.brand-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--lime);
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.home {
+  display: flex;
+  flex-direction: column;
+}
+.home-hero {
+  max-width: 800px;
+  margin: auto 0;
+  padding: 9vh 0;
+}
+.eyebrow {
+  font: 700 12px "Space Grotesk";
+  letter-spacing: 0.2em;
+  color: var(--lime);
+  text-transform: uppercase;
+}
+.home h1,
+.form-card h1,
+.game-shell h1,
+.player-shell h1 {
+  font: 600 clamp(52px, 8vw, 112px)/0.9 "Space Grotesk";
+  letter-spacing: -0.03em;
+  margin: 22px 0;
+}
+.home h1 em,
+.form-card h1 em,
+.game-shell h1 em,
+.player-shell h1 em {
+  color: var(--lime);
+  font-style: normal;
+}
+.hero-copy {
+  max-width: 440px;
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.home-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 42px;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  border: 0;
+  border-radius: 5px;
+  padding: 16px 20px;
+  text-decoration: none;
+  font-weight: 700;
+  color: #101317;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
+}
+.button:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.08);
+}
+.button-primary {
+  background: var(--lime);
+}
+.button-ghost {
+  border: 1px solid #59605c;
+  color: var(--ink);
+  background: transparent;
+}
+.home-footer,
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font: 11px "Space Grotesk";
+  letter-spacing: 0.15em;
+}
+.form-page {
+  background:
+    radial-gradient(circle at 10% 100%, #20333a 0, transparent 35%), #101317;
+}
+.connection {
+  text-transform: uppercase;
+}
+.form-card {
+  width: min(540px, 100%);
+  margin: 8vh auto 0;
+}
+.form-card h1 {
+  font-size: clamp(52px, 8vw, 86px);
+}
+.muted {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.quiz-meta {
+  display: flex;
+  border-block: 1px solid var(--line);
+  margin: 38px 0;
+  padding: 20px 0;
+  gap: 40px;
+}
+.quiz-meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.quiz-meta b {
+  font: 700 25px "Space Grotesk";
+}
+.quiz-meta span {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+}
+.wide {
+  width: 100%;
+  font-size: 16px;
+}
+.form-card label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 18px 0;
+}
+.form-card input {
+  display: block;
+  width: 100%;
+  background: #191e21;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 17px;
+  margin-top: 8px;
+  border-radius: 4px;
+  font-size: 20px;
+  outline-color: var(--lime);
+}
+.join-card {
+  margin-top: 5vh;
+}
+.error-message {
+  color: var(--coral);
+  font-size: 14px;
+}
+.game-shell {
+  background:
+    radial-gradient(circle at 85% 15%, #354227 0, transparent 30%), #101317;
+}
+.projector {
+  padding-top: 42px;
+}
+.pin-display {
+  font: 700 clamp(90px, 19vw, 240px)/0.9 "Space Grotesk";
+  letter-spacing: 0.06em;
+  color: var(--lime);
+  margin: 36px 0 20px;
+}
+.lobby-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 70px;
+  margin-top: 55px;
+}
+.lobby-grid h2 {
+  font: 600 62px "Space Grotesk";
+  margin: 0 0 25px;
+}
+.lobby-grid h2 small {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+}
+.player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.player-chip {
+  border: 1px solid var(--line);
+  padding: 11px 15px;
+  border-radius: 30px;
+  background: #191e21;
+}
+.online-dot,
+.offline-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lime);
+  margin-right: 8px;
+}
+.offline-dot {
+  background: var(--coral);
+}
+.host-actions {
+  padding-top: 8px;
+}
+.text-button {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  padding: 18px 0;
+}
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: #101317;
+  font: 700 36px "Space Grotesk";
+  margin: 20px 0;
+}
+.timer-alert {
+  background: var(--coral);
+}
+.question-title {
+  max-width: 1000px;
+}
+.answered-count,
+.result-note {
+  font-size: 21px;
+  color: var(--muted);
+}
+.leaderboard {
+  max-width: 720px;
+  margin: 25px 0;
+}
+.leader-row {
+  display: grid;
+  grid-template-columns: 55px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 20px;
+}
+.leader-row strong {
+  color: var(--lime);
+  font: 700 25px "Space Grotesk";
+}
+.leader-row b {
+  font-family: "Space Grotesk";
+}
+.leader-self {
+  background: #202a20;
+  padding-inline: 12px;
+  border-color: var(--lime);
+}
+.player-shell {
+  max-width: 720px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 25px 20px;
+  background:
+    radial-gradient(circle at 50% 0, #293a35 0, transparent 45%), #101317;
+}
+.player-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font: 700 13px "Space Grotesk";
+  letter-spacing: 0.1em;
+}
+.player-head .timer {
+  width: 58px;
+  height: 58px;
+  font-size: 23px;
+  margin: 0;
+}
+.player-question {
+  font-size: clamp(35px, 7vw, 64px) !important;
+  margin: 10vh 0 40px !important;
+}
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.answer {
+  min-height: 100px;
+  border: 0;
+  border-radius: 7px;
+  padding: 18px;
+  text-align: left;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+.answer:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+.answer:disabled {
+  opacity: 0.65;
+}
+.answer-0 {
+  background: #d84e53;
+}
+.answer-1 {
+  background: #2d75c7;
+}
+.answer-2 {
+  background: #d49b27;
+}
+.answer-3 {
+  background: #329d76;
+}
+.answer-mark {
+  font-size: 20px;
+}
+.waiting-mark {
+  font: 700 70px "Space Grotesk";
+  color: var(--lime);
+  margin-top: 18vh;
+}
+.welcome {
+  font-size: 24px;
+}
+.player-count {
+  display: inline-block;
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  color: var(--muted);
+}
+.submitted {
+  margin-top: 20vh;
+  border: 1px solid var(--lime);
+  padding: 25px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.submitted b {
+  color: var(--lime);
+  font-size: 24px;
+}
+.result-points {
+  font: 700 54px "Space Grotesk";
+  color: var(--lime);
+}
+.personal-stat {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  color: var(--muted);
+}
+.personal-stat b {
+  font: 700 24px "Space Grotesk";
+  color: var(--ink);
+}
+.result-screen .button {
+  margin-top: 30px;
+}
+.center-screen {
+  text-align: center;
+  padding-top: 30vh;
+}
+.pulse-loader {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--line);
+  border-top-color: var(--lime);
+  border-radius: 50%;
+  margin: auto;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 650px) {
+  .home-actions,
+  .lobby-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .home-actions .button {
+    width: 100%;
+  }
+  .lobby-grid {
+    gap: 30px;
+  }
+  .answers {
+    grid-template-columns: 1fr;
+  }
+  .answer {
+    min-height: 76px;
+  }
+  .pin-display {
+    font-size: 22vw;
+  }
+  .projector {
+    padding-inline: 22px;
+  }
+  .home-footer {
+    font-size: 9px;
+  }
+}
