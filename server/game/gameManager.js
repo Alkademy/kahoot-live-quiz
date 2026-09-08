@@ -1,5 +1,6 @@
 import { questions } from '../data/questions.js';
 import { calculateScore } from './scoring.js';
+import { randomUUID } from 'node:crypto';
 
 export const games = {};
 export const QUESTION_DURATION = 15000;
@@ -12,12 +13,12 @@ function makePin() {
 
 export function createGame(hostId) {
   const pin = makePin();
-  games[pin] = { pin, hostId, phase: 'WAITING', currentQuestionIndex: 0, questionStartTime: null, questionEndTime: null, players: {}, questions };
+  games[pin] = { pin, hostId, hostToken: randomUUID(), phase: 'WAITING', currentQuestionIndex: 0, questionStartTime: null, questionEndTime: null, players: {}, questions, lastResults: null };
   return games[pin];
 }
 export const getGame = (pin) => games[pin];
 export function addPlayer(game, id, playerId, nickname) {
-  const player = { id, playerId, nickname, score: 0, answered: false, currentAnswer: null, answerTime: null, correctAnswers: 0, connected: true };
+  const player = { id, playerId, nickname, score: 0, answered: false, currentAnswer: null, answerTime: null, correctAnswers: 0, answerHistory: [], connected: true };
   game.players[playerId] = player;
   return player;
 }
@@ -28,6 +29,7 @@ export function startQuestion(game, index) {
   resetAnswers(game);
   game.currentQuestionIndex = index;
   game.phase = 'QUESTION';
+  game.lastResults = null;
   game.questionStartTime = Date.now();
   game.questionEndTime = game.questionStartTime + QUESTION_DURATION;
 }
@@ -42,13 +44,22 @@ export function finishQuestion(game) {
   const question = game.questions[game.currentQuestionIndex];
   game.phase = 'RESULTS';
   Object.values(game.players).forEach((player) => {
-    if (player.currentAnswer === question.correctAnswer) {
+    const correct = player.currentAnswer === question.correctAnswer;
+    if (correct) {
       player.correctAnswers += 1;
       player.lastPoints = calculateScore(question.points, (player.answerTime || game.questionEndTime) - game.questionStartTime, QUESTION_DURATION);
       player.score += player.lastPoints;
     } else player.lastPoints = 0;
+    player.answerHistory.push({
+      questionId: question.id,
+      question: question.question,
+      selectedAnswer: player.currentAnswer === null ? null : question.options[player.currentAnswer],
+      correctAnswer: question.options[question.correctAnswer],
+      correct,
+    });
   });
-  return { correctAnswer: question.correctAnswer, correctText: question.options[question.correctAnswer], leaderboard: leaderboard(game), playerResults: Object.fromEntries(Object.values(game.players).map((player) => [player.playerId, { correct: player.currentAnswer === question.correctAnswer, points: player.lastPoints, score: player.score }])) };
+  game.lastResults = { correctAnswer: question.correctAnswer, correctText: question.options[question.correctAnswer], leaderboard: leaderboard(game), playerResults: Object.fromEntries(Object.values(game.players).map((player) => [player.playerId, { correct: player.currentAnswer === question.correctAnswer, points: player.lastPoints, score: player.score }])) };
+  return game.lastResults;
 }
 export function findPlayer(game, playerId) { return game && game.players[playerId]; }
 export function removeGame(pin) { delete games[pin]; }

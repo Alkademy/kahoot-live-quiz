@@ -8,7 +8,7 @@ Pulse Quiz is a real-time classroom quiz app. A host creates a room, players joi
 - Player mode with mobile-first answer controls
 - Unique six-digit game PINs and Socket.io rooms
 - Server-controlled 15-second countdown and speed scoring
-- Five general-knowledge starter questions
+- Ten general-knowledge starter questions
 - Live lobby, results, leaderboard, final scores, and personal rank
 - Persistent player ID with basic reconnection support
 - Host disconnect messaging and in-memory game data
@@ -28,6 +28,6 @@ cd ..
 npm run dev
 ```
 
-The frontend runs at http://localhost:5173 and the backend runs at http://localhost:5000. Copy `client/.env.example` to `client/.env` when configuring another backend URL and set `VITE_SERVER_URL`.
+The frontend runs at http://localhost:5173 and the backend runs at http://localhost:5000. Copy `client/.env.example` to `client/.env` when configuring another backend URL and set both `VITE_SERVER_URL` and `VITE_API_URL`. Configure `CLIENT_URL`, `JWT_SECRET` (at least 32 characters), and the `MYSQL_*` variables on the server.
 
 The root `npm run dev` uses `concurrently` to run both services. Games are stored in server memory for this MVP and disappear when the server restarts.

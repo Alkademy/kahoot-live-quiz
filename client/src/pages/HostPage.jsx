@@ -1,21 +1,19 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import NavigationHeader from "../components/NavigationHeader.jsx";
 export default function HostPage() {
-  const { createGame, connectionStatus, error } = useGame();
+  const { createGame, connectionStatus, error, pin, phase, role } = useGame();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (role === "host" && phase === "WAITING" && pin) {
+      navigate(`/host/game/${pin}`, { replace: true });
+    }
+  }, [navigate, phase, pin, role]);
+
   const start = () => {
     console.log("[quiz] create button clicked");
     createGame();
-    const wait = setInterval(() => {
-      const pin = sessionStorage.getItem("pulse-pin");
-      if (pin) {
-        console.log("[quiz] navigating to host room", pin);
-        clearInterval(wait);
-        navigate(`/host/game/${pin}`);
-      }
-    }, 50);
-    setTimeout(() => clearInterval(wait), 3000);
   };
   return (
     <main className="page-shell form-page">
@@ -29,7 +27,7 @@ export default function HostPage() {
           <em>live quiz.</em>
         </h1>
         <p className="muted">
-          Five quick-fire questions. One room full of energy.
+          Ten quick-fire questions. One room full of energy.
         </p>
         <div className="quiz-meta">
           <div>

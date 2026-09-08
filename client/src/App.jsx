@@ -8,6 +8,7 @@ import HostPage from './pages/HostPage.jsx';
 import HostGamePage from './pages/HostGamePage.jsx';
 import JoinPage from './pages/JoinPage.jsx';
 import PlayerGamePage from './pages/PlayerGamePage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
 import './styles/global.css';
 import './styles/auth.css';
 
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/host" element={<HostPage />} />
             <Route path="/host/game/:pin" element={<HostGamePage />} />
             <Route path="/play" element={<JoinPage />} />

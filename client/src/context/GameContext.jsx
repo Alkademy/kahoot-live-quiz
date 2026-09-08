@@ -3,6 +3,7 @@ import { socket } from "../services/socket.js";
 
 const GameContext = createContext(null);
 const playerIdKey = "pulse-quiz-player-id";
+const sessionRoleKey = "pulse-quiz-role";
 function getPlayerId() {
   let id = localStorage.getItem(playerIdKey);
   if (!id) {
@@ -24,6 +25,7 @@ export function GameProvider({ children }) {
     question: null,
     selectedAnswer: null,
     results: null,
+    answerReview: [],
     leaderboard: [],
     score: 0,
     rank: null,
@@ -36,16 +38,41 @@ export function GameProvider({ children }) {
       console.log("[quiz] socket connected", socket.id);
       update({ connectionStatus: "connected" });
       const pin = sessionStorage.getItem("pulse-pin");
-      if (pin) socket.emit("player:rejoin", { pin, playerId: getPlayerId() });
+      if (pin && sessionStorage.getItem(sessionRoleKey) === "host")
+        socket.emit("host:rejoin", {
+          pin,
+          hostToken: sessionStorage.getItem("pulse-host-token"),
+        });
+      if (pin && sessionStorage.getItem(sessionRoleKey) === "player")
+        socket.emit("player:rejoin", { pin, playerId: getPlayerId() });
     };
     const onDisconnect = () => update({ connectionStatus: "reconnecting" });
-    const onCreated = ({ pin }) => {
+    const onCreated = ({ pin, hostToken }) => {
       console.log("[quiz] game created", pin);
       sessionStorage.setItem("pulse-pin", pin);
-      update({ role: "host", pin, phase: "WAITING", error: "" });
+      sessionStorage.setItem("pulse-host-token", hostToken);
+      sessionStorage.setItem(sessionRoleKey, "host");
+      update({
+        role: "host",
+        pin,
+        phase: "WAITING",
+        answerReview: [],
+        error: "",
+      });
     };
     const onLobby = ({ pin, phase, players }) =>
       update({ pin, phase, players: players || [] });
+    const onHostState = ({ pin, phase, players, leaderboard, question, results }) =>
+      update({
+        role: "host",
+        pin,
+        phase,
+        players: players || [],
+        leaderboard: leaderboard || [],
+        question,
+        results,
+        error: "",
+      });
     const onQuestion = (question) =>
       update({
         phase: "QUESTION",
@@ -64,23 +91,37 @@ export function GameProvider({ children }) {
     };
     const onLeaderboard = ({ leaderboard }) =>
       update({ phase: "LEADERBOARD", leaderboard: leaderboard || [] });
-    const onFinished = ({ leaderboard }) =>
-      update({ phase: "FINISHED", leaderboard: leaderboard || [] });
-    const onState = ({ pin, phase, player, leaderboard }) =>
+    const onFinished = ({ leaderboard, answerReview }) =>
+      setGame((current) => ({
+        ...current,
+        phase: "FINISHED",
+        leaderboard: leaderboard || [],
+        answerReview: current.role === "player" ? answerReview || [] : [],
+      }));
+    const onState = ({ pin, phase, player, players, leaderboard, results, answerReview }) => {
+      if (sessionStorage.getItem(sessionRoleKey) === "host") return;
+      sessionStorage.setItem("pulse-pin", pin);
       update({
+        role: "player",
         pin,
         phase,
+        players: players || [],
         nickname: player.nickname,
         score: player.score,
         leaderboard: leaderboard || [],
+        results: results ? { ...results, personal: results.playerResults?.[player.playerId] } : null,
+        question: null,
+        answerReview: answerReview || [],
         error: "",
       });
+    };
     const onSubmitted = () => update({ selectedAnswer: "submitted" });
     const onError = ({ message }) => update({ error: message });
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("game:created", onCreated);
     socket.on("game:lobby", onLobby);
+    socket.on("host:state", onHostState);
     socket.on("game:question", onQuestion);
     socket.on("game:results", onResults);
     socket.on("game:leaderboard", onLeaderboard);
@@ -94,6 +135,7 @@ export function GameProvider({ children }) {
       socket.off("disconnect", onDisconnect);
       socket.off("game:created", onCreated);
       socket.off("game:lobby", onLobby);
+      socket.off("host:state", onHostState);
       socket.off("game:question", onQuestion);
       socket.off("game:results", onResults);
       socket.off("game:leaderboard", onLeaderboard);
@@ -106,18 +148,29 @@ export function GameProvider({ children }) {
   const actions = {
     createGame: () => {
       console.log("[quiz] emitting host:create-game");
-      updateRole("host");
+      sessionStorage.removeItem("pulse-pin");
+      sessionStorage.removeItem("pulse-host-token");
+      sessionStorage.setItem(sessionRoleKey, "host");
+      setGame((current) => ({
+        ...current,
+        role: "host",
+        pin: "",
+        phase: "WAITING",
+        error: "",
+      }));
       socket.emit("host:create-game");
     },
     joinGame: (pin, nickname) => {
-      sessionStorage.setItem("pulse-pin", pin);
+      sessionStorage.removeItem("pulse-pin");
       setGame((current) => ({
         ...current,
         role: "player",
-        pin,
+        pin: "",
         nickname,
+        answerReview: [],
         error: "",
       }));
+      sessionStorage.setItem(sessionRoleKey, "player");
       socket.emit("player:join", { pin, nickname, playerId: getPlayerId() });
     },
     startGame: () => socket.emit("host:start-game", { pin: game.pin }),

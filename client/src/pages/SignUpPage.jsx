@@ -45,7 +45,7 @@ export default function SignUpPage() {
     setIsLoading(false);
 
     if (success) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
       setLocalError(authError || 'Sign up failed');
     }

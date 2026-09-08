@@ -1,9 +1,16 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import NavigationHeader from "../components/NavigationHeader.jsx";
 export default function HomePage() {
+  useEffect(() => {
+    sessionStorage.removeItem("pulse-pin");
+    sessionStorage.removeItem("pulse-host-token");
+    sessionStorage.removeItem("pulse-quiz-role");
+  }, []);
+
   return (
     <main className="home page-shell">
-      <NavigationHeader />
+      <NavigationHeader homeMode />
       <section className="home-hero">
         <p className="eyebrow">LIVE CLASSROOM PLAY</p>
         <h1>

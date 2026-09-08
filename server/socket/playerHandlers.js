@@ -17,6 +17,17 @@ export function registerPlayerHandlers(io, socket) {
     if (Object.values(game.players).every((p) => p.answered || !p.connected)) { const results = finishQuestion(game); io.to(pin).emit('game:results', results); }
   });
 }
-function stateForPlayer(game, player) { return { pin: game.pin, phase: game.phase, player: { playerId: player.playerId, nickname: player.nickname, score: player.score, correctAnswers: player.correctAnswers }, leaderboard: leaderboard(game) }; }
+function stateForPlayer(game, player) {
+  const personal = game.lastResults?.playerResults?.[player.playerId];
+  return {
+    pin: game.pin,
+    phase: game.phase,
+    player: { playerId: player.playerId, nickname: player.nickname, score: player.score, correctAnswers: player.correctAnswers },
+    players: lobby(game).players,
+    leaderboard: leaderboard(game),
+    results: game.lastResults ? { ...game.lastResults, playerResults: { [player.playerId]: personal } } : null,
+    answerReview: player.answerHistory || [],
+  };
+}
 function publicQuestion(game) { const q = game.questions[game.currentQuestionIndex]; return { id: q.id, question: q.question, options: q.options, questionNumber: game.currentQuestionIndex + 1, totalQuestions: game.questions.length, startTime: game.questionStartTime, endTime: game.questionEndTime }; }
 function error(socket, message) { socket.emit('game:error', { message }); }

@@ -1,8 +1,9 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import CountdownTimer from "../components/CountdownTimer.jsx";
 import AnswerButton from "../components/AnswerButton.jsx";
 import Leaderboard from "../components/Leaderboard.jsx";
+import AnswerReview from "../components/AnswerReview.jsx";
 import NavigationHeader from "../components/NavigationHeader.jsx";
 
 export default function PlayerGamePage() {
@@ -19,6 +20,8 @@ export default function PlayerGamePage() {
     playerId,
     score,
     answer,
+    answerReview,
+    role,
   } = useGame();
   const entry = leaderboard.find((item) => item.playerId === playerId);
   const leaveHome = () => {
@@ -83,6 +86,9 @@ export default function PlayerGamePage() {
         <NavigationHeader onHome={leaveHome} />
         <p className="eyebrow">ROUND COMPLETE</p>
         <h1>{results.personal?.correct ? "Correct!" : "Not quite."}</h1>
+        <h2>
+          Correct answer: <em>{results.correctText}</em>
+        </h2>
         <p className="result-points">
           +{results.personal?.points?.toLocaleString() || "0"} points
         </p>
@@ -135,8 +141,9 @@ export default function PlayerGamePage() {
         </div>
         <div className="personal-stat">
           <span>Correct answers</span>
-          <b>{entry?.correctAnswers || 0} / 5</b>
+          <b>{entry?.correctAnswers || 0} / 10</b>
         </div>
+        {role === "player" && <AnswerReview entries={answerReview} />}
         <button
           className="button button-primary wide"
           onClick={() => navigate("/")}

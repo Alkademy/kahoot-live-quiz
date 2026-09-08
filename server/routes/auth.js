@@ -3,16 +3,18 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database.js';
 import { verifyToken } from '../middleware/auth.js';
+import jwtSecret from '../config/auth.js';
 
 const router = express.Router();
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
+  let connection;
   try {
     const { username, email, password, confirmPassword } = req.body;
 
     // Validation
-    if (!username || !email || !password || !confirmPassword) {
+    if ([username, email, password, confirmPassword].some((value) => typeof value !== 'string' || !value.trim())) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -29,12 +31,15 @@ router.post('/signup', async (req, res) => {
     }
 
     // Check if email already exists
-    const connection = await pool.getConnection();
-    const [existingUser] = await connection.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (username.trim().length < 1 || username.trim().length > 30) {
+      return res.status(400).json({ error: 'Username must be 1-30 characters long' });
+    }
+
+    connection = await pool.getConnection();
+    const [existingUser] = await connection.query('SELECT id, username FROM users WHERE email = ? OR username = ?', [email, username.trim()]);
 
     if (existingUser.length > 0) {
-      connection.release();
-      return res.status(409).json({ error: 'Email already registered' });
+      return res.status(409).json({ error: existingUser[0].username.toLowerCase() === username.trim().toLowerCase() ? 'Username already registered' : 'Email already registered' });
     }
 
     // Hash password
@@ -46,12 +51,10 @@ router.post('/signup', async (req, res) => {
       [username, email, hashedPassword]
     );
 
-    connection.release();
-
     // Generate JWT
     const token = jwt.sign(
       { id: result.insertId, email, username },
-      process.env.JWT_SECRET || 'your-secret-key',
+      jwtSecret,
       { expiresIn: '7d' }
     );
 
@@ -63,24 +66,26 @@ router.post('/signup', async (req, res) => {
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ error: 'Server error during signup' });
+  } finally {
+    connection?.release();
   }
 });
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
+  let connection;
   try {
     const { email, password } = req.body;
 
     // Validation
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     const [users] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (users.length === 0) {
-      connection.release();
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
@@ -90,16 +95,13 @@ router.post('/login', async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      connection.release();
       return res.status(401).json({ error: 'Invalid email or password' });
     }
-
-    connection.release();
 
     // Generate JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, username: user.username },
-      process.env.JWT_SECRET || 'your-secret-key',
+      jwtSecret,
       { expiresIn: '7d' }
     );
 
@@ -111,15 +113,17 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Server error during login' });
+  } finally {
+    connection?.release();
   }
 });
 
 // GET /api/auth/me
 router.get('/me', verifyToken, async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     const [users] = await connection.query('SELECT id, username, email, created_at FROM users WHERE id = ?', [req.user.id]);
-    connection.release();
 
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -129,6 +133,8 @@ router.get('/me', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Get user error:', error);
     res.status(500).json({ error: 'Server error fetching user data' });
+  } finally {
+    connection?.release();
   }
 });
 

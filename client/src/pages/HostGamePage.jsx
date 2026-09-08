@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import PlayerList from "../components/PlayerList.jsx";
 import Leaderboard from "../components/Leaderboard.jsx";
@@ -106,7 +106,7 @@ export default function HostGamePage() {
         </h1>
         <p className="result-note">Answers are in. See who is rising.</p>
         <button className="button button-primary" onClick={showLeaderboard}>
-          View leaderboard <span>→</span>
+          View leaderboard
         </button>
         <button className="text-button" onClick={leaveHome}>
           Back to home
@@ -126,7 +126,7 @@ export default function HostGamePage() {
         </h1>
         <Leaderboard entries={leaderboard} />
         <button className="button button-primary" onClick={nextQuestion}>
-          {question?.questionNumber === 5 ? "Finish game" : "Next question"}{" "}
+          {question?.questionNumber === question?.totalQuestions ? "Finish game" : "Next question"}{" "}
           <span>→</span>
         </button>
         <button className="text-button" onClick={leaveHome}>

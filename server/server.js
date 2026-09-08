@@ -7,10 +7,11 @@ import { registerSocketHandlers } from './socket/index.js';
 import authRoutes from './routes/auth.js';
 
 const app = express();
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: clientUrl }));
 
 // Routes
 app.get('/', (_req, res) => res.json({ name: 'Pulse Quiz server', status: 'running', api: ['POST /api/auth/signup', 'POST /api/auth/login', 'GET /api/auth/me'], socket: 'Socket.IO' }));
@@ -20,7 +21,7 @@ app.use('/api/auth', authRoutes);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: clientUrl,
     methods: ['GET', 'POST']
   }
 });

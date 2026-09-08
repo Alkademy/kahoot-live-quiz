@@ -1,24 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import NavigationHeader from "../components/NavigationHeader.jsx";
 export default function JoinPage() {
   const [pin, setPin] = useState("");
   const [nickname, setNickname] = useState("");
-  const { joinGame, error, connectionStatus } = useGame();
+  const { joinGame, error, connectionStatus, phase, pin: joinedPin, role } = useGame();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (role === "player" && phase === "WAITING" && joinedPin === pin) {
+      navigate(`/play/game/${joinedPin}`, { replace: true });
+    }
+  }, [joinedPin, navigate, phase, pin, role]);
+
   const submit = (event) => {
     event.preventDefault();
     if (!/^\d{6}$/.test(pin) || !nickname.trim() || nickname.trim().length > 20)
       return;
     joinGame(pin, nickname.trim());
-    const wait = setInterval(() => {
-      if (sessionStorage.getItem("pulse-pin") === pin) {
-        clearInterval(wait);
-        navigate(`/play/game/${pin}`);
-      }
-    }, 50);
-    setTimeout(() => clearInterval(wait), 3000);
   };
   return (
     <main className="page-shell form-page">

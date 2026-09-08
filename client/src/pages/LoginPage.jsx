@@ -26,7 +26,7 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (success) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
       setLocalError(authError || 'Login failed');
     }
